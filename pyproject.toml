@@ -21,3 +21,16 @@ black = "^25.1.0"
 mypy = "^1.17.1"
 isort = "^6.0.1"
 
+[tool.mypy]
+python_version = "3.11"
+warn_unused_ignores = true
+disallow_untyped_defs = true
+ignore_missing_imports = true
+pretty = true
+show_error_codes = true
+strict_optional = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+

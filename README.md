@@ -73,3 +73,15 @@ print(sort_by_date(data, descending=False))
 ## Лицензия:
 
 Проект распространяется под лицензией MIT.
+
+## Линтеры
+
+В проекте настроены проверки качества кода с помощью **flake8** и **mypy**.
+Результаты последних прогонов сохранены в файлах:
+- flake8_report.txt
+- mypy_report.txt
+
+Запуск проверок:  
+```bash
+poetry run flake8 .
+poetry run mypy src

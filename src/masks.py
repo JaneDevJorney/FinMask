@@ -11,7 +11,7 @@ def get_mask_card_number(card_number: int | str) -> str:
     last_four_digits = card_number_str[-4:]
     middle_hidden_digits = "*" * (len(card_number_str) - 10)
     masked_number = first_six_digits + middle_hidden_digits + last_four_digits
-    return " ".join(masked_number[i : i + 4] for i in range(0, len(masked_number), 4))
+    return " ".join(masked_number[i:i+4] for i in range(0, len(masked_number), 4))
 
 
 def get_mask_account(account_number: int | str) -> str:

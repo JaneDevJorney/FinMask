@@ -1,44 +1,46 @@
 from datetime import datetime
+from typing import Any
 
 from src.masks import get_mask_account, get_mask_card_number
 
 
-def mask_account_card(item: str) -> str:
+def mask_account_card(value: str) -> str:
     """
-    Функция принимает строку с номером карты или счета
-    и возвращает замаскированный номер
+    Принимает строку с типом и номером карты/счёта и возвращает строку с маской.
+    Для счёта ожидается формат: 'Счет <digits>'.
+    Для карты: '<name> <digits>'.
+    Некорректный ввод приводит к ValueError.
     """
-    item = item.strip()
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError("Некорректный ввод")
 
-    if item.lower().startswith(("счет", "счёт")):
-        parts = item.split(maxsplit=1)
-        if len(parts) != 2:
-            raise ValueError("Ожидается формат: 'Счет <номер>'")
-        number = parts[1].replace(" ", "")
-        masked = get_mask_account(number)
-        return f"Счет {masked}"
-    else:
-        try:
-            name, number = item.rsplit(maxsplit=1)
-        except ValueError as exc:
-            raise ValueError("Ожидается формат: '<Имя> <Номер>'") from exc
-        number = number.replace(" ", "")
-        masked = get_mask_card_number(number)
-        return f"{name} {masked}"
+    text = value.strip()
+
+    if text.startswith("Счет"):
+        parts = text.split()
+        if len(parts) != 2 or not parts[1].isdigit():
+            raise ValueError("Некорректный ввод")
+        return f"Счет {get_mask_account(parts[1])}"
+
+    if " " not in text:
+        raise ValueError("Некорректный ввод")
+
+    name, number = text.rsplit(" ", 1)
+    if not name.strip() or not number.isdigit():
+        raise ValueError("Некорректный ввод")
+
+    return f"{name} {get_mask_card_number(number)}"
 
 
-def get_date(item: str) -> str:
+def get_date(value: str) -> str:
     """
-    Функция принимает дату в ISO-формате
-    и возвращает строку в формате ДД.ММ.ГГГГ.
+    Преобразует ISO-дату ('YYYY-MM-DD' или 'YYYY-MM-DDTHH:MM:SS') в формат 'ДД.ММ.ГГГГ'.
+    Некорректный ввод приводит к ValueError.
     """
-    item = item.strip()
+    if not isinstance(value, str) or not value:
+        raise ValueError("Некорректная дата")
     try:
-        dt = datetime.fromisoformat(item)
-    except Exception as exc:
-        raise ValueError("Некорректный ISO-формат даты") from exc
+        dt = datetime.fromisoformat(value)
+    except Exception as exc:  # noqa: BLE001
+        raise ValueError("Некорректная дата") from exc
     return dt.strftime("%d.%m.%Y")
-
-
-if __name__ == "__main__":
-    print(get_date("2024-03-11T02:26:18.671407"))

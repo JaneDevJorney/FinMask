@@ -84,4 +84,12 @@ print(sort_by_date(data, descending=False))
 Запуск проверок:  
 ```bash
 poetry run flake8 .
-poetry run mypy src
+poetry run mypy src 
+```
+## Тестирование
+Запуск тестов:
+```bash
+pytest -v
+poetry run pytest -v
+```
+

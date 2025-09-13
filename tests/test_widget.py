@@ -1,52 +1,78 @@
-from datetime import datetime
-from src.masks import get_mask_card_number, get_mask_account
+import pytest
+from src.widget import mask_account_card, get_date
 
 
-def mask_account_card(item: str) -> str:
-    """
-    Принимает строку с номером карты или счёта и возвращает замаскированный номер.
-
-    Форматы:
-    - "<Название карты> <номер_карты>"
-    - "Счет <номер_счёта>"
-
-    На некорректный ввод выбрасывает ValueError.
-    """
-    item = item.strip()
-    if not item:
-        raise ValueError("Ожидается формат: '<Имя> <Номер>'")
-
-    if item.lower().startswith(("счет", "счёт")):
-        parts = item.split(maxsplit=1)
-        if len(parts) != 2:
-            raise ValueError("Ожидается формат: 'Счет <номер>'")
-        number = parts[1].replace(" ", "")
-        if not number.isdigit():
-            raise ValueError("Номер счета должен содержать только цифры")
-        return f"Счет {get_mask_account(number)}"
-
-    try:
-        name, number = item.rsplit(maxsplit=1)
-    except ValueError as exc:
-        raise ValueError("Ожидается формат: '<Имя> <Номер>'") from exc
-
-    number = number.replace(" ", "")
-    if not number.isdigit():
-        raise ValueError("Номер карты должен содержать только цифры")
-
-    return f"{name} {get_mask_card_number(number)}"
+@pytest.mark.parametrize(
+    "raw, expected",
+    [
+        ("Maestro 1596837868705199", "Maestro 1596 83** **** 5199"),
+        ("MasterCard 7158300734726758", "MasterCard 7158 30** **** 6758"),
+        ("Visa Classic 6831982476737658", "Visa Classic 6831 98** **** 7658"),
+        ("Visa Platinum 7000792289606361", "Visa Platinum 7000 79** **** 6361"),
+    ],
+)
+def test_mask_account_card_card(raw, expected):
+    assert mask_account_card(raw) == expected
 
 
-def get_date(item: str) -> str:
-    """
-    Принимает дату в ISO-формате и возвращает строку в формате ДД.ММ.ГГГГ.
+@pytest.mark.parametrize(
+    "raw, expected",
+    [
+        ("Счет 64686473678894779589", "Счет **9589"),
+        ("Счет 35383033474447895560", "Счет **5560"),
+        ("Счет 73654108430135874305", "Счет **4305"),
+    ],
+)
+def test_mask_account_card_account(raw, expected):
+    assert mask_account_card(raw) == expected
 
-    Допустимые входы: "YYYY-MM-DD", "YYYY-MM-DDTHH:MM:SS[.ffffff][±HH:MM]".
-    На некорректный ввод выбрасывает ValueError.
-    """
-    item = item.strip()
-    try:
-        dt = datetime.fromisoformat(item)
-    except Exception as exc:
-        raise ValueError("Некорректный ISO-формат даты") from exc
-    return dt.strftime("%d.%m.%Y")
+
+@pytest.mark.parametrize(
+    "bad_input",
+    [
+        "",
+        "Visa Platinum",
+        "Счет ABCD",
+        "Просто текст",
+    ],
+)
+def test_mask_account_card_invalid_inputs(bad_input):
+    with pytest.raises(ValueError):
+        mask_account_card(bad_input)
+
+
+def test_mask_account_card_no_space_raises():
+    """Если строка без пробела — должна упасть с ValueError"""
+    with pytest.raises(ValueError):
+        mask_account_card("Visa")
+
+
+def test_get_date_iso():
+    assert get_date("2024-03-11T12:00:00") == "11.03.2024"
+
+
+@pytest.mark.parametrize(
+    "value, expected",
+    [
+        ("2024-03-11", "11.03.2024"),
+        ("2024-03-11T00:00:00", "11.03.2024"),
+    ],
+)
+def test_get_date_various_formats(value, expected):
+    assert get_date(value) == expected
+
+
+@pytest.mark.parametrize(
+    "bad_value",
+    [
+        "",
+        "abc",
+        "32.13.2024",
+        "2024/03/11",
+        "11.03.2024",
+    ],
+)
+def test_get_date_invalid_inputs(bad_value):
+    with pytest.raises(ValueError):
+        get_date(bad_value)
+

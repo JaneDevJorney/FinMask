@@ -1,55 +1,32 @@
 from datetime import datetime
-from typing import Dict, List
+from typing import Any, Dict, Iterable, List
 
 
-def filter_by_state(data: List[Dict], state: str = "EXECUTED") -> List[Dict]:
+def filter_by_state(items: Iterable[Dict[str, Any]], state: str = "EXECUTED") -> List[Dict[str, Any]]:
     """
-    Фильтрует список словарей по значению ключа "state".
-
-    :param data: список словарей с операциями
-    :param state: значение для фильтрации (по умолчанию "EXECUTED")
-    :return: новый список словарей, у которых ключ "state" равен заданному значению
+    Возвращает новый список словарей, отфильтрованный по значению ключа 'state'.
     """
-    result = []
-    for item in data:
-        if isinstance(item, dict) and item.get("state") == state:
-            result.append(item)
-    return result
+    return [item for item in items if item.get("state") == state]
 
 
-def sort_by_date(data: List[Dict], descending: bool = True) -> List[Dict]:
+def sort_by_date(items: Iterable[Dict[str, Any]], descending: bool = True) -> List[Dict[str, Any]]:
     """
-    Сортирует список словарей по значению ключа "date".
-
-    :param data: список словарей с операциями
-    :param descending: порядок сортировки (по умолчанию True — по убыванию)
-    :return: новый список словарей, отсортированный по дате
+    Сортирует список словарей по ключу 'date' в ISO-формате.
+    При отсутствии или некорректности даты выбрасывает ValueError.
     """
-    data_copy = data.copy()
-    for i in range(len(data_copy)):
-        for j in range(i + 1, len(data_copy)):
-            date_i = datetime.fromisoformat(data_copy[i]["date"])
-            date_j = datetime.fromisoformat(data_copy[j]["date"])
-            if descending and date_i < date_j:
-                data_copy[i], data_copy[j] = data_copy[j], data_copy[i]
-            if not descending and date_i > date_j:
-                data_copy[i], data_copy[j] = data_copy[j], data_copy[i]
-    return data_copy
+    items_list: List[Dict[str, Any]] = list(items)
 
+    parsed_items = []
+    for item in items_list:
+        if "date" not in item or not item["date"]:
+            raise ValueError("Отсутствует корректная дата")
 
-if __name__ == "__main__":
-    sample = [
-        {'id': 41428829, 'state': 'EXECUTED', 'date': '2019-07-03T18:35:29.512364'},
-        {'id': 939719570, 'state': 'EXECUTED', 'date': '2018-06-30T02:08:58.425572'},
-        {'id': 594226727, 'state': 'CANCELED', 'date': '2018-09-12T21:27:25.241689'},
-        {'id': 615064591, 'state': 'CANCELED', 'date': '2018-10-14T08:21:33.419441'},
-    ]
+        try:
+            parsed_date = datetime.fromisoformat(item["date"])
+        except Exception as exc:
+            raise ValueError("Некорректный ISO-формат даты") from exc
 
-    print("EXECUTED:", filter_by_state(sample))
-    print("CANCELED:", filter_by_state(sample, "CANCELED"))
+        parsed_items.append((parsed_date, item))
 
-    print("\nПо убыванию (новые → старые):")
-    print(sort_by_date(sample))
-
-    print("\nПо возрастанию (старые → новые):")
-    print(sort_by_date(sample, descending=False))
+    parsed_items.sort(key=lambda x: x[0], reverse=descending)
+    return [it for _, it in parsed_items]

@@ -102,3 +102,8 @@ poetry run pytest -v
 poetry run isort . --check-only
 poetry run isort .
 ```
+## Покрытие тестами
+Сгенерировать HTML-отчёт:
+```bash
+poetry run pytest --cov=src --cov-report=html
+```

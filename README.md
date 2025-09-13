@@ -93,3 +93,12 @@ pytest -v
 poetry run pytest -v
 ```
 
+```markdown
+## Форматирование импортов
+
+Для сортировки импортов используется **isort**:
+
+```bash
+poetry run isort . --check-only
+poetry run isort .
+```

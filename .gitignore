@@ -1,7 +1,5 @@
 __pycache__/
-.idea/.coverage
+.idea/
 mylog.txt
 .coverage
-.idea/
-.idea/
-.coverage
+htmlcov/

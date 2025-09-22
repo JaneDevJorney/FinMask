@@ -1,4 +1,8 @@
-from src.generators import filter_by_currency, transaction_descriptions
+from src.generators import (
+    card_number_generator,
+    filter_by_currency,
+    transaction_descriptions,
+)
 
 transactions = [
     {
@@ -19,7 +23,6 @@ transactions = [
 ]
 
 
-# --------- ТЕСТЫ ДЛЯ filter_by_currency ---------
 def test_filter_by_currency_usd():
     usd_iter = filter_by_currency(transactions, "USD")
     result = list(usd_iter)
@@ -42,11 +45,9 @@ def test_filter_by_currency_eur():
 def test_filter_by_currency_empty():
     gbp_iter = filter_by_currency(transactions, "GBP")
     result = list(gbp_iter)
-
     assert result == []
 
 
-# --------- ТЕСТЫ ДЛЯ transaction_descriptions ---------
 def test_transaction_descriptions_all():
     descriptions = list(transaction_descriptions(transactions))
     assert descriptions == [
@@ -60,3 +61,45 @@ def test_transaction_descriptions_empty():
     empty_transactions = [{}]
     descriptions = list(transaction_descriptions(empty_transactions))
     assert descriptions == []
+
+
+def test_card_number_generator_small_range():
+    gen = card_number_generator(1, 5)
+    result = list(gen)
+    assert result == [
+        "0000 0000 0000 0001",
+        "0000 0000 0000 0002",
+        "0000 0000 0000 0003",
+        "0000 0000 0000 0004",
+        "0000 0000 0000 0005",
+    ]
+
+
+def test_card_number_generator_formatting():
+    gen = card_number_generator(123456789012345, 123456789012345)
+    got = next(gen)
+    # 123456789012345 -> '0123456789012345'
+    assert got == "0123 4567 8901 2345"
+
+
+def test_card_number_generator_bounds_and_errors():
+    # start > end
+    try:
+        list(card_number_generator(5, 1))
+        assert False, "ожидали ValueError"
+    except ValueError:
+        pass
+
+    # ниже минимума
+    try:
+        list(card_number_generator(0, 2))
+        assert False, "ожидали ValueError"
+    except ValueError:
+        pass
+
+    # выше максимума
+    try:
+        list(card_number_generator(1, 10_000_000_000_000_000))
+        assert False, "ожидали ValueError"
+    except ValueError:
+        pass

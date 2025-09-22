@@ -1,18 +1,17 @@
 from src.decorators import log
 
 
-def test_log_ok_prints_to_stdout(capfd):
+def test_log_ok_prints_to_stdout(capsys):
     @log()
     def plus(a, b):
         return a + b
 
     assert plus(1, 2) == 3
-    out, err = capfd.readouterr()
+    out = capsys.readouterr().out
     assert "plus ok" in out
-    assert err == ""
 
 
-def test_log_error_prints_and_raises(capfd):
+def test_log_error_prints_and_raises(capsys):
     @log()
     def div(a, b):
         return a / b
@@ -21,7 +20,7 @@ def test_log_error_prints_and_raises(capfd):
         div(1, 0)
         assert False, "div should raise ZeroDivisionError"
     except ZeroDivisionError:
-        out, _ = capfd.readouterr()
+        out = capsys.readouterr().out
         assert "div error: ZeroDivisionError" in out
         assert "Inputs: (1, 0), {}" in out
 

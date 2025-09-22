@@ -11,7 +11,8 @@ def log(filename: Optional[str] = None) -> Callable:
     - имя функции и результат выполнения (если успешно);
     - имя функции, тип ошибки и входные параметры (если произошла ошибка).
 
-    :param filename: путь к файлу для логирования. Если None — вывод в консоль.
+    :param filename: путь к файлу для логирования.
+        Если None — вывод в консоль.
     """
 
     def decorator(func: Callable) -> Callable:
@@ -29,13 +30,14 @@ def log(filename: Optional[str] = None) -> Callable:
                 )
                 _write_log(message, filename)
                 raise
+
         return wrapper
 
     return decorator
 
 
 def _write_log(message: str, filename: Optional[str]) -> None:
-    """Вспомогательная функция для записи лога в файл или консоль."""
+    """Записать лог в файл или вывести в консоль."""
     if filename:
         with open(filename, "a", encoding="utf-8") as f:
             f.write(message + "\n")

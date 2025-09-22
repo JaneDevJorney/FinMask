@@ -1,109 +1,63 @@
 # Проект "FinMask"
 
-## Описание:
+## Описание
+**FinMask** — учебное приложение на Python для работы с данными банковских операций.  
+В проекте реализованы функции-генераторы для фильтрации, получения описаний транзакций и генерации номеров карт.  
+Тесты обеспечивают 100% покрытие кода.
 
-Проект **"FinMask"** — это учебное приложение на Python для работы с данными банковских операций.  
-В рамках проекта реализованы функции фильтрации и сортировки операций.
-
-## Установка:
-
+## Установка
 1. Клонируйте репозиторий:
-```
-git clone git@github.com:JaneDevJorney/FinMask.git
-```
+   ```bash
+   git clone git@github.com:JaneDevJorney/FinMask.git
+   ```
 2. Перейдите в папку проекта:
-```
-cd FinMask
-```
+   ```bash
+   cd FinMask
+   ```
+3. Установите зависимости (через Poetry):
+   ```bash
+   poetry install
+   ```
+   
+## Использование
 
-3. Установите зависимости (через Poetry или pip):
-```
-poetry install 
-```
+Примеры работы функций находятся в модуле src/generators.py.
 
-## Использование:
+### Функции:
+- `filter_by_currency(transactions, currency_code)` — возвращает транзакции с указанным кодом валюты.
+- `transaction_descriptions(transactions)` — генератор, возвращающий описание каждой транзакции.
+- `card_number_generator(start, end)` — генератор номеров карт в формате XXXX XXXX XXXX XXXX.
 
-Примеры работы функций находятся в модуле `processing.py`.
-
-### filter_by_state
-
-Фильтрует список словарей по значению ключа `state`.
-
-**Пример:**
+### Пример:
 ```python
-from src.processing import filter_by_state
+from src.generators import (
+    filter_by_currency,
+    transaction_descriptions,
+    card_number_generator,
+)
 
-data = [
-    {"id": 1, "state": "EXECUTED"},
-    {"id": 2, "state": "CANCELED"},
+transactions = [
+    {"id": 1, "operationAmount": {"amount": "100", "currency": {"code": "USD"}}, "description": "Перевод"},
+    {"id": 2, "operationAmount": {"amount": "200", "currency": {"code": "EUR"}}, "description": "Перевод со счета"},
 ]
 
-print(filter_by_state(data))
-# [{'id': 1, 'state': 'EXECUTED'}]
+# Фильтрация по валюте
+usd = list(filter_by_currency(transactions, "USD"))
+print(usd)
 
-print(filter_by_state(data, "CANCELED"))
-# [{'id': 2, 'state': 'CANCELED'}]
-```
-### sort_by_date
+# Описание транзакций
+desc = list(transaction_descriptions(transactions))
+print(desc)
 
-Сортирует список словарей по значению ключа date.
-
-**Пример:**
-```python
-from src.processing import sort_by_date
-
-data = [
-    {"id": 1, "state": "EXECUTED", "date": "2019-07-03T18:35:29.512364"},
-    {"id": 2, "state": "EXECUTED", "date": "2018-06-30T02:08:58.425572"},
-]
-
-print(sort_by_date(data))
-# [{'id': 1, 'state': 'EXECUTED', 'date': '2019-07-03T18:35:29.512364'},
-#  {'id': 2, 'state': 'EXECUTED', 'date': '2018-06-30T02:08:58.425572'}]
-
-print(sort_by_date(data, descending=False))
-# [{'id': 2, 'state': 'EXECUTED', 'date': '2018-06-30T02:08:58.425572'},
-#  {'id': 1, 'state': 'EXECUTED', 'date': '2019-07-03T18:35:29.512364'}]
+# Генерация номеров карт
+for number in card_number_generator(1, 3):
+    print(number)
 ```
 
-## Документация:
-
-Подробное описание функций и примеры можно найти в модуле src/processing.py.
-
-## Лицензия:
-
-Проект распространяется под лицензией MIT.
-
-## Линтеры
-
-В проекте настроены проверки качества кода с помощью **flake8** и **mypy**.
-Результаты последних прогонов сохранены в файлах:
-- flake8_report.txt
-- mypy_report.txt
-
-Запуск проверок:  
-```bash
-poetry run flake8 .
-poetry run mypy src 
-```
 ## Тестирование
-Запуск тестов:
-```bash
-pytest -v
-poetry run pytest -v
-```
 
-```markdown
-## Форматирование импортов
-
-Для сортировки импортов используется **isort**:
-
-```bash
-poetry run isort . --check-only
-poetry run isort .
-```
-## Покрытие тестами
-Сгенерировать HTML-отчёт:
-```bash
-poetry run pytest --cov=src --cov-report=html
-```
+Для запуска тестов с проверкой покрытия:
+  ```bash
+  poetry run pytest --cov=src --cov-report=term-missing -v 
+  ```
+Покрытие тестами: 100%

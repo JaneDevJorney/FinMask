@@ -1,5 +1,6 @@
 from src.decorators import log
 
+
 def test_log_ok_prints_to_stdout(capfd):
     @log()
     def plus(a, b):

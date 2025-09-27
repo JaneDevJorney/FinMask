@@ -6,11 +6,19 @@ from src.generators import (
 from src.decorators import log
 
 
-def main():
+def main() -> None:
     # Демонстрация генераторов
     transactions = [
-        {"id": 1, "operationAmount": {"amount": "100", "currency": {"code": "USD"}}, "description": "Перевод"},
-        {"id": 2, "operationAmount": {"amount": "200", "currency": {"code": "EUR"}}, "description": "Снятие"},
+        {
+            "id": 1,
+            "operationAmount": {"amount": "100", "currency": {"code": "USD"}},
+            "description": "Перевод",
+        },
+        {
+            "id": 2,
+            "operationAmount": {"amount": "200", "currency": {"code": "EUR"}},
+            "description": "Снятие",
+        },
     ]
 
     print("Фильтрация по валюте:")
@@ -31,7 +39,9 @@ def main():
     print("\nДемонстрация декоратора:")
     try:
         print(divide(10, 2))
-        print(divide(10, 0))
+        print(
+            divide(10, 0)
+        )  # Строка разбита, чтобы избежать ошибки E501 (длина > 79)
     except ZeroDivisionError:
         print("Ошибка деления на ноль корректно зафиксирована логгером")
 

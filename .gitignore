@@ -1,2 +1,16 @@
 __pycache__/
+*.py[cod]
+
 .idea/
+.vscode/
+
+*.log
+mylog.txt
+
+.coverage
+htmlcov/
+
+.venv/
+venv/
+ENV/
+.env

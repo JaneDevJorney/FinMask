@@ -1,8 +1,10 @@
 import json
+from unittest.mock import MagicMock, patch
+
 import pytest
-from unittest.mock import patch, MagicMock
-from src.utils import load_transactions
+
 from src.external_api import convert_to_rub
+from src.utils import load_transactions
 
 
 def test_load_transactions_valid_file(tmp_path):
@@ -84,6 +86,7 @@ def test_convert_to_rub_invalid_currency():
 
     with pytest.raises(ValueError, match="Unsupported currency"):
         convert_to_rub(transaction)
+
 
 def test_load_transactions_file_not_found():
     from src.utils import load_transactions

@@ -21,18 +21,21 @@
     ```
 3.	Установите зависимости (через Poetry):
     ```bash
-     poetry install
+    poetry install
     ```
 ## Использование
 
 ### Модуль generators
 
-Пример работы функций находится в модуле src/generators.py.
+В проекте реализован модуль `generators`, содержащий функции для работы с транзакциями.
+
 
 ### Функции:
-	- filter_by_currency(transactions, currency_code) — возвращает транзакции с указанным кодом валюты.
-	- transaction_descriptions(transactions) — генератор, возвращающий описание каждой транзакции.
-	- card_number_generator(start, end) — генератор номеров карт в формате XXXX XXXX XXXX XXXX.
+
+- `filter_by_currency(transactions, currency_code)` — возвращает транзакции с указанным кодом валюты.
+- `transaction_descriptions(transactions)` — генератор, возвращающий описание каждой транзакции.
+- `card_number_generator(start, end)` — генератор номеров карт в формате `XXXX XXXX XXXX XXXX`.
+
 ### Пример 
 ```python
 from src.generators import (
@@ -61,12 +64,13 @@ for number in card_number_generator(1, 3):
 
 ### Модуль decorators
 
-В проекте реализован модуль decorators, содержащий декоратор @log.
+В проекте реализован модуль `decorators`, содержащий декоратор @log.
 
 ### Возможности
-	- Логирование успешного выполнения функций.
-	- Логирование ошибок с указанием типа исключения и входных аргументов.
-	- Поддержка вывода логов в консоль или запись в файл.
+
+- Логирование успешного выполнения функций.
+- Логирование ошибок с указанием типа исключения и входных аргументов.
+- Поддержка вывода логов в консоль или запись в файл.
 
 ### Пример использования
 ```python
@@ -86,7 +90,9 @@ print(divide(10, 0))
 ```
 
 ### Пример содержимого mylog.txt
+```
 add ok
+```
 
 ## Тестирование
 1. Запуск тестов:
@@ -98,3 +104,8 @@ add ok
    poetry run pytest --cov=src --cov-report=html
    ```
 3. HTML-отчет доступен в папке htmlcov/.
+
+## Запуск демо
+Для запуска демонстрации работы проекта:
+```bash
+poetry run python main.py

@@ -7,7 +7,7 @@ from src.decorators import log
 
 
 def main() -> None:
-    # Демонстрация генераторов
+    """Демонстрация работы генераторов и декоратора log."""
     transactions = [
         {
             "id": 1,
@@ -31,7 +31,6 @@ def main() -> None:
     for number in card_number_generator(1, 3):
         print(number)
 
-    # Демонстрация декоратора
     @log()
     def divide(a: int, b: int) -> float:
         return a / b
@@ -39,9 +38,7 @@ def main() -> None:
     print("\nДемонстрация декоратора:")
     try:
         print(divide(10, 2))
-        print(
-            divide(10, 0)
-        )  # Строка разбита, чтобы избежать ошибки E501 (длина > 79)
+        print(divide(10, 0))
     except ZeroDivisionError:
         print("Ошибка деления на ноль корректно зафиксирована логгером")
 

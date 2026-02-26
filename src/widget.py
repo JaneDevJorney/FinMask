@@ -1,44 +1,53 @@
 from datetime import datetime
+import re
 
 from src.masks import get_mask_account, get_mask_card_number
 
 
 def mask_account_card(item: str) -> str:
     """
-    Функция принимает строку с номером карты или счета
-    и возвращает замаскированный номер
+    Функция принимает строку с типом и номером карты или счета,
+    маскирует номер в зависимости от типа.
     """
     item = item.strip()
 
-    if item.lower().startswith(("счет", "счёт")):
-        parts = item.split(maxsplit=1)
+    if item.lower().startswith("счет"):
+        parts = item.split()
         if len(parts) != 2:
-            raise ValueError("Ожидается формат: 'Счет <номер>'")
-        number = parts[1].replace(" ", "")
-        masked = get_mask_account(number)
-        return f"Счет {masked}"
-    else:
-        try:
-            name, number = item.rsplit(maxsplit=1)
-        except ValueError as exc:
-            raise ValueError("Ожидается формат: '<Имя> <Номер>'") from exc
-        number = number.replace(" ", "")
-        masked = get_mask_card_number(number)
-        return f"{name} {masked}"
+            raise ValueError("Некорректный формат строки со счётом")
+        name, number = parts
+        return f"{name} {get_mask_account(number)}"
+
+    parts = item.rsplit(" ", 1)
+    if len(parts) != 2:
+        raise ValueError("Некорректный формат строки с картой")
+
+    name, number = parts
+    return f"{name} {get_mask_card_number(number)}"
 
 
 def get_date(item: str) -> str:
     """
-    Функция принимает дату в ISO-формате
-    и возвращает строку в формате ДД.ММ.ГГГГ.
+    Принимает дату (ISO-формата или ДД.ММ.ГГГГ)
+    и возвращает её в формате ДД.ММ.ГГГГ.
     """
-    item = item.strip()
+    s = item.strip()
+
+    # Если уже в формате ДД.ММ.ГГГГ
+    if re.fullmatch(r"\d{2}\.\d{2}\.\d{4}", s):
+        return s
+
+    # Пробуем ISO-формат
     try:
-        dt = datetime.fromisoformat(item)
-    except Exception as exc:
-        raise ValueError("Некорректный ISO-формат даты") from exc
-    return dt.strftime("%d.%m.%Y")
+        dt = datetime.fromisoformat(s)
+        return dt.strftime("%d.%m.%Y")
+    except ValueError:
+        pass
 
+    # Пробуем просто YYYY-MM-DD
+    try:
+        dt = datetime.strptime(s, "%Y-%m-%d")
+        return dt.strftime("%d.%m.%Y")
+    except ValueError as exc:
+        raise ValueError("Некорректный формат даты") from exc
 
-if __name__ == "__main__":
-    print(get_date("2024-03-11T02:26:18.671407"))
